@@ -12,7 +12,7 @@ contract1 = { workspace = true, features = ["client"] }
 contract2 = { workspace = true, features = ["client"] }
 
 [build-dependencies]
-risc0-build = { version = "2.0.1", optional = true }
+risc0-build = { version = "2.0.2", optional = true }
 
 [package.metadata.risc0]
 methods = ["contract1", "contract2"]
