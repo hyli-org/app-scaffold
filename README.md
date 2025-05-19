@@ -14,7 +14,11 @@ Currently, only Risc0 contracts are supported.
 
 ## Getting Started
 
-To run the scaffold, you need to start three components in order.
+### Pre-requisites
+
+- Clone [the Hyli node repository](github.com/hyli-org/hyli)
+- Clone this repository
+- [Install RISC-Zero](https://dev.risczero.com/api/zkvm/install)
 
 ### 1. Start the Hyli node
 
