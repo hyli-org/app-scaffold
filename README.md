@@ -1,4 +1,4 @@
-# Hylé App Scaffold
+# Hyli App Scaffold
 
 This repository provides a scaffold to build applications on the Hyli network using Risc0 contracts.
 
