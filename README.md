@@ -45,7 +45,9 @@ This starts the backend service, which handles contract interactions and proofs.
 To navigate to the frontend directory and start the development server:
 
 ```bash
-cd front && bun run dev
+cd front
+bun install
+bun run dev
 ```
 
 This runs the web interface for interacting with the Hylé network.
