@@ -87,6 +87,7 @@ function App() {
   };
 
   const sendBlobTx = async () => {
+    setInitialResult('');
     if (!username) {
       setInitialResult('Please enter a username first. e.g. <username>.contract1');
       setConfirmationResult(null);
@@ -129,7 +130,7 @@ function App() {
       <div className="user-input">
         <input
           type="text"
-          placeholder="Enter username"
+          placeholder="Enter username: user1@contract1"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="username-input"

@@ -5,7 +5,7 @@ edition = "2021"
 [dependencies]
 sdk = { workspace = true, features = ["tracing"] }
 client-sdk = { workspace = true, features = ["risc0", "rest"] }
-hyle = { workspace = true }
+hyle-modules = { workspace = true }
 contract1 = { workspace = true, features = ["client"] }
 contract2 = { workspace = true, features = ["client"] }
 # Remove features if you want reproducible builds with docker
@@ -13,6 +13,7 @@ contracts = { workspace = true, features = ["nonreproducible"] }
 
 risc0-zkvm = { version = "2.0.0", features = ["prove"] }
 
+config = { version = "0.15.11", default-features = false, features = ["toml"] }
 axum = "0.8.3"
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }

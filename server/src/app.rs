@@ -8,18 +8,16 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use client_sdk::rest_client::NodeApiHttpClient;
-use contract1::Contract1Action;
+use client_sdk::{contract_indexer::AppError, rest_client::NodeApiHttpClient};
+use contract1::{Contract1, Contract1Action};
 use contract2::Contract2Action;
-use hyle::{
-    bus::{BusClientReceiver, BusMessage, SharedMessageBus},
-    model::CommonRunContext,
-    module_handle_messages,
-    rest::AppError,
-    utils::modules::{module_bus_client, Module},
-};
 
-use sdk::{BlobTransaction, ContractName, TxHash};
+use hyle_modules::{
+    bus::{BusClientReceiver, SharedMessageBus},
+    module_bus_client, module_handle_messages,
+    modules::{prover::AutoProverEvent, BuildApiContextInner, Module},
+};
+use sdk::{BlobTransaction, ContractName};
 use serde::Serialize;
 use tokio::sync::Mutex;
 use tower_http::cors::{Any, CorsLayer};
@@ -29,36 +27,27 @@ pub struct AppModule {
 }
 
 pub struct AppModuleCtx {
-    pub common: Arc<CommonRunContext>,
+    pub api: Arc<BuildApiContextInner>,
     pub node_client: Arc<NodeApiHttpClient>,
     pub contract1_cn: ContractName,
     pub contract2_cn: ContractName,
 }
 
-#[derive(Debug, Clone)]
-pub enum AppEvent {
-    SequencedTx(TxHash),
-    FailedTx(TxHash, String),
-}
-impl BusMessage for AppEvent {}
-
 module_bus_client! {
 #[derive(Debug)]
 pub struct AppModuleBusClient {
-    receiver(AppEvent),
+    receiver(AutoProverEvent<Contract1>),
 }
 }
 
 impl Module for AppModule {
     type Context = Arc<AppModuleCtx>;
 
-    async fn build(ctx: Self::Context) -> Result<Self> {
+    async fn build(bus: SharedMessageBus, ctx: Self::Context) -> Result<Self> {
         let state = RouterCtx {
+            bus: Arc::new(Mutex::new(bus.new_handle())),
             contract1_cn: ctx.contract1_cn.clone(),
             contract2_cn: ctx.contract2_cn.clone(),
-            app: Arc::new(Mutex::new(HyleOofCtx {
-                bus: ctx.common.bus.new_handle(),
-            })),
             client: ctx.node_client.clone(),
         };
 
@@ -75,12 +64,12 @@ impl Module for AppModule {
             .with_state(state)
             .layer(cors); // Appliquer le middleware CORS
 
-        if let Ok(mut guard) = ctx.common.router.lock() {
+        if let Ok(mut guard) = ctx.api.router.lock() {
             if let Some(router) = guard.take() {
                 guard.replace(router.merge(api));
             }
         }
-        let bus = AppModuleBusClient::new_from_bus(ctx.common.bus.new_handle()).await;
+        let bus = AppModuleBusClient::new_from_bus(bus.new_handle()).await;
 
         Ok(AppModule { bus })
     }
@@ -96,14 +85,10 @@ impl Module for AppModule {
 
 #[derive(Clone)]
 struct RouterCtx {
-    pub app: Arc<Mutex<HyleOofCtx>>,
+    pub bus: Arc<Mutex<SharedMessageBus>>,
     pub client: Arc<NodeApiHttpClient>,
     pub contract1_cn: ContractName,
     pub contract2_cn: ContractName,
-}
-
-pub struct HyleOofCtx {
-    pub bus: SharedMessageBus,
 }
 
 async fn health() -> impl IntoResponse {
@@ -115,38 +100,14 @@ async fn health() -> impl IntoResponse {
 // --------------------------------------------------------
 
 const USER_HEADER: &str = "x-user";
-const SESSION_KEY_HEADER: &str = "x-session-key";
-const SIGNATURE_HEADER: &str = "x-request-signature";
 
 #[derive(Debug)]
 struct AuthHeaders {
-    session_key: String,
-    signature: String,
     user: String,
 }
 
 impl AuthHeaders {
     fn from_headers(headers: &HeaderMap) -> Result<Self, AppError> {
-        let session_key = headers
-            .get(SESSION_KEY_HEADER)
-            .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| {
-                AppError(
-                    StatusCode::UNAUTHORIZED,
-                    anyhow::anyhow!("Missing session key"),
-                )
-            })?;
-
-        let signature = headers
-            .get(SIGNATURE_HEADER)
-            .and_then(|v| v.to_str().ok())
-            .ok_or_else(|| {
-                AppError(
-                    StatusCode::UNAUTHORIZED,
-                    anyhow::anyhow!("Missing signature"),
-                )
-            })?;
-
         let user = headers
             .get(USER_HEADER)
             .and_then(|v| v.to_str().ok())
@@ -158,8 +119,6 @@ impl AuthHeaders {
             })?;
 
         Ok(AuthHeaders {
-            session_key: session_key.to_string(),
-            signature: signature.to_string(),
             user: user.to_string(),
         })
     }
@@ -179,7 +138,7 @@ async fn increment(
     headers: HeaderMap,
 ) -> Result<impl IntoResponse, AppError> {
     let auth = AuthHeaders::from_headers(&headers)?;
-    send(ctx.clone(), auth).await
+    send(ctx, auth).await
 }
 
 async fn get_config(State(ctx): State<RouterCtx>) -> impl IntoResponse {
@@ -189,8 +148,6 @@ async fn get_config(State(ctx): State<RouterCtx>) -> impl IntoResponse {
 }
 
 async fn send(ctx: RouterCtx, auth: AuthHeaders) -> Result<impl IntoResponse, AppError> {
-    let _header_session_key = auth.session_key.clone();
-    let _header_signature = auth.signature.clone();
     let identity = auth.user.clone();
 
     let action_contract1 = Contract1Action::Increment;
@@ -217,20 +174,19 @@ async fn send(ctx: RouterCtx, auth: AuthHeaders) -> Result<impl IntoResponse, Ap
     let tx_hash = res.unwrap();
 
     let mut bus = {
-        let app = ctx.app.lock().await;
-        AppModuleBusClient::new_from_bus(app.bus.new_handle()).await
+        let bus = ctx.bus.lock().await;
+        AppModuleBusClient::new_from_bus(bus.new_handle()).await
     };
 
     tokio::time::timeout(Duration::from_secs(5), async {
         loop {
-            let a = bus.recv().await?;
-            match a {
-                AppEvent::SequencedTx(sequenced_tx_hash) => {
+            match bus.recv().await? {
+                AutoProverEvent::<Contract1>::SuccessTx(sequenced_tx_hash, _) => {
                     if sequenced_tx_hash == tx_hash {
                         return Ok(Json(sequenced_tx_hash));
                     }
                 }
-                AppEvent::FailedTx(sequenced_tx_hash, error) => {
+                AutoProverEvent::<Contract1>::FailedTx(sequenced_tx_hash, error) => {
                     if sequenced_tx_hash == tx_hash {
                         return Err(AppError(StatusCode::BAD_REQUEST, anyhow::anyhow!(error)));
                     }

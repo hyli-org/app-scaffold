@@ -9,11 +9,6 @@ path = "src/main.rs"
 required-features = ["risc0"]
 test = false
 
-[[example]]
-name = "contract2-runner"
-path = "examples/host.rs"
-
-
 [dependencies]
 anyhow = "1.0.96"
 sdk = { workspace = true }
