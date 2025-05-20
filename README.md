@@ -1,4 +1,4 @@
-# Hylé App Scaffold
+# Hyli App Scaffold
 
 This repository provides a scaffold to build applications on the Hyli network using Risc0 contracts.
 
@@ -22,7 +22,7 @@ Currently, only Risc0 contracts are supported.
 
 ### 1. Start the Hyli node
 
-From your local Hylé node repository:
+From your local Hyli node repository:
 
 ```bash
 RISC0_DEV_MODE=1 cargo run -- --pg
@@ -50,7 +50,7 @@ bun install
 bun run dev
 ```
 
-This runs the web interface for interacting with the Hylé network.
+This runs the web interface for interacting with the Hyli network.
 
 ## Development
 
