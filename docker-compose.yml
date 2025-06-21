@@ -3,6 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
+    platform: linux/amd64
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -20,6 +21,7 @@ services:
       start_period: 80s
   hyli:
     image: ghcr.io/hyli-org/hyli:0.13.1
+    platform: linux/amd64
     environment:
       - RISC0_DEV_MODE=true
       - SP1_PROVER=mock
@@ -44,6 +46,7 @@ services:
         condition: service_healthy
   wallet-server:
     image: ghcr.io/hyli-org/wallet/wallet-server:0.1.2
+    platform: linux/amd64
     environment:
       - RISC0_DEV_MODE=true
       - SP1_PROVER=mock
@@ -60,6 +63,7 @@ services:
         condition: service_healthy
   wallet-ui:
     image: ghcr.io/hyli-org/wallet/wallet-ui:0.1.2
+    platform: linux/amd64
     environment:
       - VITE_WALLET_SERVER_BASE_URL=http://localhost:4001
       - VITE_WALLET_WS_URL=ws://localhost:8081/ws
