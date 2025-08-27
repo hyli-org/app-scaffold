@@ -1,6 +1,6 @@
 use anyhow::Context;
 use client_sdk::transaction_builder::TxExecutorHandler;
-use sdk::{utils::as_hyle_output, Blob, Calldata, RegisterContractEffect, ZkContract};
+use sdk::{utils::as_hyli_output, Blob, Calldata, RegisterContractEffect, ZkContract};
 
 use crate::Contract1;
 
@@ -14,11 +14,11 @@ impl TxExecutorHandler for Contract1 {
         borsh::to_vec(self).context("Failed to encode Contract1")
     }
 
-    fn handle(&mut self, calldata: &Calldata) -> anyhow::Result<sdk::HyleOutput> {
+    fn handle(&mut self, calldata: &Calldata) -> anyhow::Result<sdk::HyliOutput> {
         let initial_state_commitment = <Self as ZkContract>::commit(self);
         let mut res = <Self as ZkContract>::execute(self, calldata);
         let next_state_commitment = <Self as ZkContract>::commit(self);
-        Ok(as_hyle_output(
+        Ok(as_hyli_output(
             initial_state_commitment,
             next_state_commitment,
             calldata,

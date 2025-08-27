@@ -9,7 +9,7 @@ use client_sdk::{
 use conf::Conf;
 use contract1::Contract1;
 use contract2::Contract2;
-use hyle_modules::{
+use hyli_modules::{
     bus::{metrics::BusMetrics, SharedMessageBus},
     modules::{
         contract_state_indexer::{ContractStateIndexer, ContractStateIndexerCtx},
@@ -122,24 +122,34 @@ async fn main() -> Result<()> {
     handler
         .build_module::<AutoProver<Contract1>>(Arc::new(AutoProverCtx {
             data_directory: config.data_directory.clone(),
-            prover: Arc::new(Risc0Prover::new(contracts::CONTRACT1_ELF)),
+            prover: Arc::new(Risc0Prover::new(
+                contracts::CONTRACT1_ELF,
+                contracts::CONTRACT1_ID,
+            )),
             contract_name: args.contract1_cn.clone().into(),
             node: app_ctx.node_client.clone(),
             default_state: Default::default(),
             buffer_blocks: config.buffer_blocks,
             max_txs_per_proof: config.max_txs_per_proof,
+            tx_working_window_size: config.tx_working_window_size,
+            api: Some(api_ctx.clone()),
         }))
         .await?;
 
     handler
         .build_module::<AutoProver<Contract2>>(Arc::new(AutoProverCtx {
             data_directory: config.data_directory.clone(),
-            prover: Arc::new(Risc0Prover::new(contracts::CONTRACT2_ELF)),
+            prover: Arc::new(Risc0Prover::new(
+                contracts::CONTRACT2_ELF,
+                contracts::CONTRACT2_ID,
+            )),
             contract_name: args.contract2_cn.clone().into(),
             node: app_ctx.node_client.clone(),
             default_state: Default::default(),
             buffer_blocks: config.buffer_blocks,
             max_txs_per_proof: config.max_txs_per_proof,
+            tx_working_window_size: config.tx_working_window_size,
+            api: Some(api_ctx.clone()),
         }))
         .await?;
 
@@ -149,6 +159,7 @@ async fn main() -> Result<()> {
             start_block: None,
             data_directory: config.data_directory.clone(),
             da_read_from: config.da_read_from.clone(),
+            timeout_client_secs: 10,
         })
         .await?;
 

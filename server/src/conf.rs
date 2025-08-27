@@ -19,6 +19,7 @@ pub struct Conf {
 
     pub buffer_blocks: u32,
     pub max_txs_per_proof: usize,
+    pub tx_working_window_size: usize,
 }
 
 impl Conf {
@@ -33,7 +34,7 @@ impl Conf {
         }
         let conf: Self = s
             .add_source(
-                Environment::with_prefix("hyle")
+                Environment::with_prefix("hyli")
                     .separator("__")
                     .prefix_separator("_")
                     .list_separator(",")

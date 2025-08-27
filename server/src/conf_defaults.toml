@@ -11,3 +11,4 @@ indexer_url = "http://localhost:4321"
 
 buffer_blocks = 0
 max_txs_per_proof = 30
+tx_working_window_size = 150
