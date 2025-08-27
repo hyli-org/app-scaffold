@@ -23,15 +23,15 @@ services:
     environment:
       - RISC0_DEV_MODE=true
       - SP1_PROVER=mock
-      - HYLE_DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
-    command: ["/hyle/hyle", "--run-indexer", "true"]
+      - HYLI_DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+    command: ["/hyli/hyli", "--run-indexer", "true"]
     ports:
       - "4321:4321"
       - "1231:1231"
       - "4141:4141"
       - "1414:1414"
     volumes:
-      - hyli_data:/hyle/data
+      - hyli_data:/hyli/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4321/v1/info"]
@@ -47,9 +47,9 @@ services:
     environment:
       - RISC0_DEV_MODE=true
       - SP1_PROVER=mock
-      - HYLE_DA_READ_FROM=hyli:4141
-      - HYLE_NODE_URL=http://hyli:4321
-      - HYLE_INDEXER_URL=http://hyli:4321
+      - HYLI_DA_READ_FROM=hyli:4141
+      - HYLI_NODE_URL=http://hyli:4321
+      - HYLI_INDEXER_URL=http://hyli:4321
     command: ["/app/server", "-m", "-a", "-w"]
     ports:
       - "4001:4000"

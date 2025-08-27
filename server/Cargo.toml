@@ -5,7 +5,7 @@ edition = "2021"
 [dependencies]
 sdk = { workspace = true, features = ["tracing"] }
 client-sdk = { workspace = true, features = ["risc0", "rest"] }
-hyle-modules = { workspace = true }
+hyli-modules = { workspace = true }
 contract1 = { workspace = true, features = ["client"] }
 contract2 = { workspace = true, features = ["client"] }
 # Remove features if you want reproducible builds with docker
@@ -42,11 +42,11 @@ prometheus = { version = "0.13.4" }
 
 
 zip = "=2.3.0"
-risc0-binfmt = "2.0.0"
-risc0-circuit-keccak = "2.0.0"
-risc0-zkp = "2.0.0"
-risc0-circuit-keccak-sys = "2.0.0"
-risc0-circuit-recursion = "2.0.0"
-risc0-sys = "1.4.0"
-risc0-circuit-recursion-sys = "2.0.0"
-risc0-groth16 = "2.0.0"
+# risc0-binfmt = "2.0.0"
+# risc0-circuit-keccak = "2.0.0"
+# risc0-zkp = "2.0.0"
+# risc0-circuit-keccak-sys = "2.0.0"
+# risc0-circuit-recursion = "2.0.0"
+# risc0-sys = "1.4.0"
+# risc0-circuit-recursion-sys = "2.0.0"
+# risc0-groth16 = "2.0.0"

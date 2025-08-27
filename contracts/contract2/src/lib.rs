@@ -8,6 +8,7 @@ pub mod client;
 #[cfg(feature = "client")]
 pub mod indexer;
 
+impl sdk::FullStateRevert for Contract2 {}
 impl sdk::ZkContract for Contract2 {
     /// Entry point of the contract's logic
     fn execute(&mut self, calldata: &sdk::Calldata) -> RunResult {

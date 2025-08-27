@@ -15,7 +15,7 @@ use client_sdk::{
 use contract1::{Contract1, Contract1Action};
 use contract2::Contract2Action;
 
-use hyle_modules::{
+use hyli_modules::{
     bus::{BusClientReceiver, SharedMessageBus},
     module_bus_client, module_handle_messages,
     modules::{prover::AutoProverEvent, BuildApiContextInner, Module},
@@ -79,7 +79,7 @@ impl Module for AppModule {
 
     async fn run(&mut self) -> Result<()> {
         module_handle_messages! {
-            on_bus self.bus,
+            on_self self,
         };
 
         Ok(())
@@ -137,7 +137,6 @@ struct IncrementRequest {
     wallet_blobs: [Blob; 2],
 }
 
-
 // --------------------------------------------------------
 //     Routes
 // --------------------------------------------------------
@@ -145,7 +144,7 @@ struct IncrementRequest {
 async fn increment(
     State(ctx): State<RouterCtx>,
     headers: HeaderMap,
-    Json(request): Json<IncrementRequest>
+    Json(request): Json<IncrementRequest>,
 ) -> Result<impl IntoResponse, AppError> {
     let auth = AuthHeaders::from_headers(&headers)?;
     send(ctx, auth, request.wallet_blobs).await
@@ -157,14 +156,17 @@ async fn get_config(State(ctx): State<RouterCtx>) -> impl IntoResponse {
     })
 }
 
-async fn send(ctx: RouterCtx, auth: AuthHeaders, wallet_blobs: [Blob; 2]) -> Result<impl IntoResponse, AppError> {
+async fn send(
+    ctx: RouterCtx,
+    auth: AuthHeaders,
+    wallet_blobs: [Blob; 2],
+) -> Result<impl IntoResponse, AppError> {
     let identity = auth.user.clone();
 
     let action_contract1 = Contract1Action::Increment;
     let action_contract2 = Contract2Action::Increment;
 
     let mut blobs = wallet_blobs.to_vec();
-
 
     blobs.extend(vec![
         action_contract1.as_blob(ctx.contract1_cn.clone()),
