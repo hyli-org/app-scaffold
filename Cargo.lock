@@ -2467,27 +2467,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "contract2"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "borsh",
- "clap",
- "contract2",
- "hyli-client-sdk",
- "hyli-contract-sdk",
- "risc0-zkvm",
- "serde",
- "tokio",
- "tracing-subscriber 0.3.19",
-]
-
-[[package]]
 name = "contracts"
 version = "0.0.0"
 dependencies = [
  "contract1",
- "contract2",
  "hyli-contract-sdk",
  "risc0-build",
 ]
@@ -7264,7 +7247,6 @@ dependencies = [
  "clap",
  "config",
  "contract1",
- "contract2",
  "contracts",
  "hex",
  "hmac",

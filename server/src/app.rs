@@ -13,7 +13,6 @@ use client_sdk::{
     rest_client::{NodeApiClient, NodeApiHttpClient},
 };
 use contract1::{Contract1, Contract1Action};
-use contract2::Contract2Action;
 
 use hyli_modules::{
     bus::{BusClientReceiver, SharedMessageBus},
@@ -33,7 +32,6 @@ pub struct AppModuleCtx {
     pub api: Arc<BuildApiContextInner>,
     pub node_client: Arc<NodeApiHttpClient>,
     pub contract1_cn: ContractName,
-    pub contract2_cn: ContractName,
 }
 
 module_bus_client! {
@@ -50,7 +48,6 @@ impl Module for AppModule {
         let state = RouterCtx {
             bus: Arc::new(Mutex::new(bus.new_handle())),
             contract1_cn: ctx.contract1_cn.clone(),
-            contract2_cn: ctx.contract2_cn.clone(),
             client: ctx.node_client.clone(),
         };
 
@@ -91,7 +88,6 @@ struct RouterCtx {
     pub bus: Arc<Mutex<SharedMessageBus>>,
     pub client: Arc<NodeApiHttpClient>,
     pub contract1_cn: ContractName,
-    pub contract2_cn: ContractName,
 }
 
 async fn health() -> impl IntoResponse {
@@ -164,14 +160,10 @@ async fn send(
     let identity = auth.user.clone();
 
     let action_contract1 = Contract1Action::Increment;
-    let action_contract2 = Contract2Action::Increment;
 
     let mut blobs = wallet_blobs.to_vec();
 
-    blobs.extend(vec![
-        action_contract1.as_blob(ctx.contract1_cn.clone()),
-        action_contract2.as_blob(ctx.contract2_cn.clone()),
-    ]);
+    blobs.extend(vec![action_contract1.as_blob(ctx.contract1_cn.clone())]);
 
     let res = ctx
         .client

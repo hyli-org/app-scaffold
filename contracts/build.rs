@@ -2,19 +2,12 @@
 #[cfg(any(clippy, not(feature = "build")))]
 fn main() {}
 
-#[cfg(all(
-    feature = "build",
-    not(any(feature = "contract1", feature = "contract2"))
-))]
+#[cfg(all(feature = "build", not(any(feature = "contract1"))))]
 fn main() {
-    compile_error!("When the 'build' feature is enabled, at least one of the following features must also be enabled: all, contract1, contract2.");
+    compile_error!("When the 'build' feature is enabled, at least one of the following features must also be enabled: all, contract1.");
 }
 
-#[cfg(all(
-    not(clippy),
-    feature = "build",
-    any(feature = "contract1", feature = "contract2",)
-))]
+#[cfg(all(not(clippy), feature = "build", feature = "contract1"))]
 fn main() {
     trait CodegenConsts {
         fn codegen_consts(&self) -> String;
@@ -62,8 +55,6 @@ fn main() {
     let methods: Vec<GuestListEntry> = [
         #[cfg(feature = "contract1")]
         "contract1",
-        #[cfg(feature = "contract2")]
-        "contract2",
     ]
     .iter()
     .map(|name| {

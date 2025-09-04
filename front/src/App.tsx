@@ -11,7 +11,6 @@ interface ContractState {
 function ScaffoldApp() {
   const { logout, wallet, createIdentityBlobs } = useWallet();
   const [contract1State, setContract1State] = useState<ContractState | null>(null);
-  const [contract2State, setContract2State] = useState<ContractState | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialResult, setInitialResult] = useState<string | null>(null);
   const [confirmationResult, setConfirmationResult] = useState<string | null>(null);
@@ -19,17 +18,17 @@ function ScaffoldApp() {
   const fetchContractState = async (contractName: string) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_SERVER_BASE_URL}/v1/indexer/contract/${contractName}/state`);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`HTTP error ${response.status}: ${errorText || response.statusText}`);
       }
-      
+
       const text = await response.text();
       if (!text) {
         throw new Error('Empty response');
       }
-      
+
       const data = JSON.parse(text);
       return { state: data };
     } catch (error) {
@@ -40,12 +39,10 @@ function ScaffoldApp() {
 
   useEffect(() => {
     const fetchStates = async () => {
-      const [state1, state2] = await Promise.all([
+      const [state1] = await Promise.all([
         fetchContractState('contract1'),
-        fetchContractState('contract2')
       ]);
       setContract1State(state1);
-      setContract2State(state2);
     };
 
     fetchStates();
@@ -57,20 +54,20 @@ function ScaffoldApp() {
   const pollTransactionStatus = async (txHash: string): Promise<void> => {
     const maxAttempts = 30; // 30 seconds timeout
     let attempts = 0;
-    
+
     while (attempts < maxAttempts) {
       try {
         const response = await fetch(`${import.meta.env.VITE_NODE_BASE_URL}/v1/indexer/transaction/hash/${txHash}`);
         if (!response.ok) {
           throw new Error(`HTTP error ${response.status}`);
         }
-        
+
         const data = await response.json();
         if (data.transaction_status === "Success") {
           setConfirmationResult(`Transaction confirmed successful! Hash: ${txHash}`);
           return;
         }
-        
+
         // Wait 1 second before next attempt
         await new Promise(resolve => setTimeout(resolve, 1000));
         attempts++;
@@ -79,7 +76,7 @@ function ScaffoldApp() {
         // Continue polling even if there's an error
       }
     }
-    
+
     setConfirmationResult(`Transaction ${txHash} timed out after ${maxAttempts} seconds`);
   };
 
@@ -96,7 +93,7 @@ function ScaffoldApp() {
     try {
       // Create identity blobs
       const [blob0, blob1] = createIdentityBlobs();
-      
+
       const headers = new Headers();
       headers.append('content-type', 'application/json');
       headers.append('x-user', wallet.address);
@@ -110,7 +107,7 @@ function ScaffoldApp() {
           wallet_blobs: [blob0, blob1]
         })
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || `HTTP error ${response.status}`);
@@ -118,7 +115,7 @@ function ScaffoldApp() {
 
       const data = await response.json();
       setInitialResult(`Transaction sent! Hash: ${JSON.stringify(data)}`);
-      
+
       // Start polling for transaction status
       await pollTransactionStatus(data);
     } catch (error) {
@@ -132,7 +129,7 @@ function ScaffoldApp() {
 
   return (
     <div className="App">
-      <button 
+      <button
         className="logout-button"
         onClick={logout}
         style={{ position: 'absolute', top: '24px', right: '24px' }}
@@ -149,8 +146,8 @@ function ScaffoldApp() {
           <span className="wallet-value">{wallet?.address || 'Not connected'}</span>
         </div>
       </div>
-      <button 
-        className="blob-button" 
+      <button
+        className="blob-button"
         onClick={sendBlobTx}
         disabled={loading}
       >
@@ -167,68 +164,60 @@ function ScaffoldApp() {
             <pre>{contract1State?.state ? JSON.stringify(contract1State.state, null, 2) : 'Loading...'}</pre>
           )}
         </div>
-        <div className="contract-state">
-          <h2>Contract 2 State</h2>
-          {contract2State?.error ? (
-            <div className="error">{contract2State.error}</div>
-          ) : (
-            <pre>{contract2State?.state ? JSON.stringify(contract2State.state, null, 2) : 'Loading...'}</pre>
-          )}
-        </div>
       </div>
     </div>
   );
 }
 
 function LandingPage() {
-    return (
-        <div className="wallet-page-wrapper">
-            <div className="landing-content-simple">
-                <h1 className="hero-title">
-                    <span className="gradient-text">Hyli</span> App Scaffold
-                </h1>
-                <p className="hero-subtitle">
-                    A starting point for your next blockchain application
-                </p>
-                <HyliWallet
-                    providers={["password", "google", "github"]}
-                />
-            </div>
-            <div className="floating-shapes">
-                <div className="shape shape-1"></div>
-                <div className="shape shape-2"></div>
-                <div className="shape shape-3"></div>
-            </div>
-        </div>
-    );
+  return (
+    <div className="wallet-page-wrapper">
+      <div className="landing-content-simple">
+        <h1 className="hero-title">
+          <span className="gradient-text">Hyli</span> App Scaffold
+        </h1>
+        <p className="hero-subtitle">
+          A starting point for your next blockchain application
+        </p>
+        <HyliWallet
+          providers={["password", "google", "github"]}
+        />
+      </div>
+      <div className="floating-shapes">
+        <div className="shape shape-1"></div>
+        <div className="shape shape-2"></div>
+        <div className="shape shape-3"></div>
+      </div>
+    </div>
+  );
 }
 
 function AppContent() {
-    const { wallet } = useWallet();
-    
-    if (!wallet) {
-        return <LandingPage />;
-    }
-    
-    return <ScaffoldApp />;
+  const { wallet } = useWallet();
+
+  if (!wallet) {
+    return <LandingPage />;
+  }
+
+  return <ScaffoldApp />;
 }
 
 function App() {
-    return (
-        <WalletProvider
-            config={{
-                nodeBaseUrl: import.meta.env.VITE_NODE_BASE_URL,
-                walletServerBaseUrl: import.meta.env.VITE_WALLET_SERVER_BASE_URL,
-                applicationWsUrl: import.meta.env.VITE_WALLET_WS_URL,
-            }}
-            sessionKeyConfig={{
-                duration: 24 * 60 * 60 * 1000, // Session key duration in ms (default: 72h)
-                whitelist: ["contract1", "contract2"], // Required: contracts allowed for session key
-            }}
-        >
-            <AppContent />
-        </WalletProvider>
-    )
+  return (
+    <WalletProvider
+      config={{
+        nodeBaseUrl: import.meta.env.VITE_NODE_BASE_URL,
+        walletServerBaseUrl: import.meta.env.VITE_WALLET_SERVER_BASE_URL,
+        applicationWsUrl: import.meta.env.VITE_WALLET_WS_URL,
+      }}
+      sessionKeyConfig={{
+        duration: 24 * 60 * 60 * 1000, // Session key duration in ms (default: 72h)
+        whitelist: ["contract1"], // Required: contracts allowed for session key
+      }}
+    >
+      <AppContent />
+    </WalletProvider>
+  )
 }
 
 export default App;

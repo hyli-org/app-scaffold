@@ -8,7 +8,6 @@ use client_sdk::{
 };
 use conf::Conf;
 use contract1::Contract1;
-use contract2::Contract2;
 use hyli_modules::{
     bus::{metrics::BusMetrics, SharedMessageBus},
     modules::{
@@ -37,9 +36,6 @@ pub struct Args {
 
     #[arg(long, default_value = "contract1")]
     pub contract1_cn: String,
-
-    #[arg(long, default_value = "contract2")]
-    pub contract2_cn: String,
 }
 
 #[tokio::main]
@@ -63,18 +59,11 @@ async fn main() -> Result<()> {
         IndexerApiHttpClient::new(config.indexer_url.clone()).context("build indexer client")?,
     );
 
-    let contracts = vec![
-        init::ContractInit {
-            name: args.contract1_cn.clone().into(),
-            program_id: contract1::client::tx_executor_handler::metadata::PROGRAM_ID,
-            initial_state: Contract1::default().commit(),
-        },
-        init::ContractInit {
-            name: args.contract2_cn.clone().into(),
-            program_id: contract2::client::tx_executor_handler::metadata::PROGRAM_ID,
-            initial_state: Contract2::default().commit(),
-        },
-    ];
+    let contracts = vec![init::ContractInit {
+        name: args.contract1_cn.clone().into(),
+        program_id: contract1::client::tx_executor_handler::metadata::PROGRAM_ID,
+        initial_state: Contract1::default().commit(),
+    }];
 
     match init::init_node(node_client.clone(), indexer_client.clone(), contracts).await {
         Ok(_) => {}
@@ -98,7 +87,6 @@ async fn main() -> Result<()> {
         api: api_ctx.clone(),
         node_client,
         contract1_cn: args.contract1_cn.clone().into(),
-        contract2_cn: args.contract2_cn.clone().into(),
     });
 
     handler.build_module::<AppModule>(app_ctx.clone()).await?;
@@ -112,14 +100,6 @@ async fn main() -> Result<()> {
         .await?;
 
     handler
-        .build_module::<ContractStateIndexer<Contract2>>(ContractStateIndexerCtx {
-            contract_name: args.contract2_cn.clone().into(),
-            data_directory: config.data_directory.clone(),
-            api: api_ctx.clone(),
-        })
-        .await?;
-
-    handler
         .build_module::<AutoProver<Contract1>>(Arc::new(AutoProverCtx {
             data_directory: config.data_directory.clone(),
             prover: Arc::new(Risc0Prover::new(
@@ -127,23 +107,6 @@ async fn main() -> Result<()> {
                 contracts::CONTRACT1_ID,
             )),
             contract_name: args.contract1_cn.clone().into(),
-            node: app_ctx.node_client.clone(),
-            default_state: Default::default(),
-            buffer_blocks: config.buffer_blocks,
-            max_txs_per_proof: config.max_txs_per_proof,
-            tx_working_window_size: config.tx_working_window_size,
-            api: Some(api_ctx.clone()),
-        }))
-        .await?;
-
-    handler
-        .build_module::<AutoProver<Contract2>>(Arc::new(AutoProverCtx {
-            data_directory: config.data_directory.clone(),
-            prover: Arc::new(Risc0Prover::new(
-                contracts::CONTRACT2_ELF,
-                contracts::CONTRACT2_ID,
-            )),
-            contract_name: args.contract2_cn.clone().into(),
             node: app_ctx.node_client.clone(),
             default_state: Default::default(),
             buffer_blocks: config.buffer_blocks,

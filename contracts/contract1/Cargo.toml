@@ -25,6 +25,7 @@ risc0-zkvm = { version = "=2.3", default-features = false, optional = true, feat
 client-sdk = { workspace = true, default-features = false, features = [
   "risc0",
   "rest",
+  "indexer",
 ], optional = true }
 
 [dev-dependencies]

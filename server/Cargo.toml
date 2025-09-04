@@ -7,7 +7,6 @@ sdk = { workspace = true, features = ["tracing"] }
 client-sdk = { workspace = true, features = ["risc0", "rest"] }
 hyli-modules = { workspace = true }
 contract1 = { workspace = true, features = ["client"] }
-contract2 = { workspace = true, features = ["client"] }
 # Remove features if you want reproducible builds with docker
 contracts = { workspace = true, features = ["nonreproducible"] }
 

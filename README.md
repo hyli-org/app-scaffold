@@ -18,17 +18,17 @@ Currently, only Risc0 contracts are supported.
 
 ### Pre-requisites
 
-- Clone [the Hyli node repository](github.com/hyli-org/hyli)
+- Install [Hylix](https://github.com/hyli-org/hyli/blob/main/crates/hylix/README.md) (Binary: `hy`)
 - Clone this repository
 - [Install RISC-Zero](https://dev.risczero.com/api/zkvm/install)
 - [Install Docker](https://docs.docker.com/compose/install/)
 
-### 1. Start the Hyli node
+### 1. Start the Hyli devnet
 
 You can run the docker node and the wallet using
 
 ```bash
-docker-compose up -d
+hy devnet start --bake
 ```
 
 This will launch a development-mode node and the wallet server and ui.
@@ -38,7 +38,9 @@ This will launch a development-mode node and the wallet server and ui.
 From the root of this repository:
 
 ```bash
-RISC0_DEV_MODE=1 cargo run -p server
+# Export devnet env vars first, so that server can connect to your local devnet
+source <(hy devnet env)>
+cargo run -p server
 ```
 
 This starts the backend service, which handles contract interactions and proofs.

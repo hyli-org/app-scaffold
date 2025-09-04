@@ -37,8 +37,7 @@ impl Conf {
                 Environment::with_prefix("hyli")
                     .separator("__")
                     .prefix_separator("_")
-                    .list_separator(",")
-                    .try_parsing(true),
+                    .list_separator(","),
             )
             .build()?
             .try_deserialize()?;
