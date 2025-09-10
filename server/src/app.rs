@@ -188,13 +188,13 @@ async fn send(
     tokio::time::timeout(Duration::from_secs(5), async {
         loop {
             match bus.recv().await? {
-                AutoProverEvent::<Contract1>::SuccessTx(sequenced_tx_hash, _) => {
-                    if sequenced_tx_hash == tx_hash {
-                        return Ok(Json(sequenced_tx_hash));
+                AutoProverEvent::<Contract1>::SuccessTx(sequenced_tx_id, _) => {
+                    if sequenced_tx_id.1 == tx_hash {
+                        return Ok(Json(sequenced_tx_id));
                     }
                 }
-                AutoProverEvent::<Contract1>::FailedTx(sequenced_tx_hash, error) => {
-                    if sequenced_tx_hash == tx_hash {
+                AutoProverEvent::<Contract1>::FailedTx(sequenced_tx_id, error) => {
+                    if sequenced_tx_id.1 == tx_hash {
                         return Err(AppError(StatusCode::BAD_REQUEST, anyhow::anyhow!(error)));
                     }
                 }
