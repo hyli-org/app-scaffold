@@ -49,3 +49,6 @@ zip = "=2.3.0"
 # risc0-sys = "1.4.0"
 # risc0-circuit-recursion-sys = "2.0.0"
 # risc0-groth16 = "2.0.0"
+
+[features]
+nonreproducible = ["contracts/nonreproducible"]
