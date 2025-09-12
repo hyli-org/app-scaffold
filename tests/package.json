@@ -48,6 +48,11 @@
       "html"
     ],
     "verbose": true,
-    "testTimeout": 10000
+    "testTimeout": 1e4
+  },
+  "dependencies": {
+    "hyli": "^0.4.1",
+    "hyli-check-secret": "^0.4.1",
+    "hyli-wallet": "^0.3.7"
   }
 }

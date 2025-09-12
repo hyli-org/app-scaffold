@@ -9,14 +9,20 @@
 
 // env var provided by hylix testing environment
 const BASE_URL = process.env.API_BASE_URL || 'http://localhost:4002';
+const NODE_BASE_URL = process.env.HYLI_NODE_BASE_URL || 'http://localhost:4321';
+const HYLI_WALLET_API_URL = process.env.HYLI_WALLET_API_URL || 'http://localhost:4000';
 
-// Test data - you may need to adjust these based on your actual blob format
-const MOCK_WALLET_BLOBS = [
-  "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-  "0xfedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321"
-];
+import { verifyIdentity, IndexerService } from "hyli-wallet";
+import { build_blob } from "hyli-check-secret";
 
-const TEST_USER = "test-user-123";
+const walletIndexer = IndexerService.initialize(HYLI_WALLET_API_URL);
+
+const bob = await walletIndexer.getAccountInfo("bob");
+
+const TEST_USER = "bob";
+const TEST_IDENTITY = `bob@wallet`;
+const TEST_PASSWORD = `hylisecure:${bob.salt}`;
+const WALLET_BLOBS = [verifyIdentity(TEST_USER, bob.nonce + 1), await build_blob(TEST_IDENTITY, TEST_PASSWORD)];
 
 /**
  * Helper function to make HTTP requests
@@ -99,57 +105,21 @@ describe('Server API Tests', () => {
   });
 
   // describe('Increment Endpoint', () => {
-  //   test('should reject requests without authentication', async () => {
+  //   test('should increment the contract state', async () => {
   //     const response = await makeRequest(`${BASE_URL}/api/increment`, {
   //       method: 'POST',
+  //       headers: {
+  //         'x-user': TEST_USER,
+  //         'Content-Type': 'application/json'
+  //       },
   //       body: JSON.stringify({
-  //         wallet_blobs: MOCK_WALLET_BLOBS
+  //         wallet_blobs: WALLET_BLOBS,
   //       })
   //     });
   //
-  //     expect(response.status).toBe(401);
-  //   });
+  //     console.log("Increment response:", response);
   //
-  //   test('should accept requests with authentication header', async () => {
-  //     const response = await makeRequest(`${BASE_URL}/api/increment`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'x-user': TEST_USER
-  //       },
-  //       body: JSON.stringify({
-  //         wallet_blobs: MOCK_WALLET_BLOBS
-  //       })
-  //     });
-  //
-  //     // Should not return 401 (unauthorized) - auth header is accepted
-  //     expect(response.status).not.toBe(401);
-  //
-  //     // Could be 200 (success) or 400 (bad request due to mock data)
-  //     expect([200, 400]).toContain(response.status);
-  //   });
-  //
-  //   test('should require valid JSON body', async () => {
-  //     const response = await makeRequest(`${BASE_URL}/api/increment`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'x-user': TEST_USER
-  //       },
-  //       body: 'invalid json'
-  //     });
-  //
-  //     expect(response.status).toBe(400);
-  //   });
-  //
-  //   test('should require wallet_blobs in request body', async () => {
-  //     const response = await makeRequest(`${BASE_URL}/api/increment`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'x-user': TEST_USER
-  //       },
-  //       body: JSON.stringify({})
-  //     });
-  //
-  //     expect(response.status).toBe(400);
+  //     expect(response.status).toBe(200);
   //   });
   // });
 
