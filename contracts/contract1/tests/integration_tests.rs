@@ -1,7 +1,6 @@
-use client_sdk::test::assert_handle;
-use client_sdk::transaction_builder::TxExecutorHandler;
+use client_sdk::tests::assert_handle;
 use contract1::{Contract1, Contract1Action};
-use sdk::{BlobIndex, BlobTransaction, Calldata, Hashed, HyliOutput, TxContext};
+use sdk::{BlobIndex, BlobTransaction};
 
 #[test]
 fn test_contract_lifecycle() {
