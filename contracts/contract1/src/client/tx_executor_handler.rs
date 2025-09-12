@@ -1,6 +1,6 @@
 use anyhow::Context;
 use client_sdk::transaction_builder::TxExecutorHandler;
-use sdk::{utils::as_hyli_output, Blob, Calldata, RegisterContractEffect, ZkContract};
+use sdk::{utils::as_hyli_output, Blob, Calldata, Contract, ContractName, ZkContract};
 
 use crate::Contract1;
 
@@ -10,6 +10,8 @@ pub mod metadata {
 }
 
 impl TxExecutorHandler for Contract1 {
+    type Contract = Self;
+
     fn build_commitment_metadata(&self, _blob: &Blob) -> anyhow::Result<Vec<u8>> {
         borsh::to_vec(self).context("Failed to encode Contract1")
     }
@@ -27,7 +29,8 @@ impl TxExecutorHandler for Contract1 {
     }
 
     fn construct_state(
-        _register_blob: &RegisterContractEffect,
+        _contract_name: &ContractName,
+        _contract: &Contract,
         _metadata: &Option<Vec<u8>>,
     ) -> anyhow::Result<Self> {
         Ok(Self::default())

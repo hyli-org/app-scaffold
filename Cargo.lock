@@ -1232,6 +1232,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-compression"
+version = "0.4.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "977eb15ea9efd848bb8a4a1a2500347ed7f0bf794edf0dc3ddcf439f43d36b23"
+dependencies = [
+ "compression-codecs",
+ "compression-core",
+ "futures-core",
+ "pin-project-lite",
+ "tokio",
+]
+
+[[package]]
 name = "async-executor"
 version = "1.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2383,6 +2396,23 @@ name = "compare"
 version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea0095f6103c2a8b44acd6fd15960c801dafebf02e21940360833e0673f48ba7"
+
+[[package]]
+name = "compression-codecs"
+version = "0.4.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "485abf41ac0c8047c07c87c72c8fb3eb5197f6e9d7ded615dfd1a00ae00a0f64"
+dependencies = [
+ "compression-core",
+ "flate2",
+ "memchr",
+]
+
+[[package]]
+name = "compression-core"
+version = "0.4.29"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e47641d3deaf41fb1538ac1f54735925e275eaf3bf4d55c81b137fba797e5cbb"
 
 [[package]]
 name = "concurrent-queue"
@@ -3929,8 +3959,8 @@ dependencies = [
 
 [[package]]
 name = "hyli-bonsai-runner"
-version = "0.13.0-rc.4"
-source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc1#e0534292f389e25296127b3a427690f2f7eb1376"
+version = "0.14.0-rc3"
+source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc3#71e3ee5bdec94ba540d9f091542e354c53cf1b51"
 dependencies = [
  "anyhow",
  "bincode",
@@ -3948,8 +3978,8 @@ dependencies = [
 
 [[package]]
 name = "hyli-client-sdk"
-version = "0.13.0-rc.4"
-source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc1#e0534292f389e25296127b3a427690f2f7eb1376"
+version = "0.14.0-rc3"
+source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc3#71e3ee5bdec94ba540d9f091542e354c53cf1b51"
 dependencies = [
  "anyhow",
  "axum",
@@ -3969,8 +3999,8 @@ dependencies = [
 
 [[package]]
 name = "hyli-contract-sdk"
-version = "0.13.0-rc.4"
-source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc1#e0534292f389e25296127b3a427690f2f7eb1376"
+version = "0.14.0-rc3"
+source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc3#71e3ee5bdec94ba540d9f091542e354c53cf1b51"
 dependencies = [
  "borsh",
  "hyli-model",
@@ -3982,8 +4012,8 @@ dependencies = [
 
 [[package]]
 name = "hyli-crypto"
-version = "0.13.0-rc.4"
-source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc1#e0534292f389e25296127b3a427690f2f7eb1376"
+version = "0.14.0-rc3"
+source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc3#71e3ee5bdec94ba540d9f091542e354c53cf1b51"
 dependencies = [
  "anyhow",
  "blst",
@@ -3995,8 +4025,8 @@ dependencies = [
 
 [[package]]
 name = "hyli-model"
-version = "0.13.0-rc.4"
-source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc1#e0534292f389e25296127b3a427690f2f7eb1376"
+version = "0.14.0-rc3"
+source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc3#71e3ee5bdec94ba540d9f091542e354c53cf1b51"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -4018,8 +4048,8 @@ dependencies = [
 
 [[package]]
 name = "hyli-modules"
-version = "0.13.0-rc.4"
-source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc1#e0534292f389e25296127b3a427690f2f7eb1376"
+version = "0.14.0-rc3"
+source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc3#71e3ee5bdec94ba540d9f091542e354c53cf1b51"
 dependencies = [
  "anyhow",
  "anymap",
@@ -4057,8 +4087,8 @@ dependencies = [
 
 [[package]]
 name = "hyli-net"
-version = "0.13.0-rc.4"
-source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc1#e0534292f389e25296127b3a427690f2f7eb1376"
+version = "0.14.0-rc3"
+source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc3#71e3ee5bdec94ba540d9f091542e354c53cf1b51"
 dependencies = [
  "anyhow",
  "axum",
@@ -4083,8 +4113,8 @@ dependencies = [
 
 [[package]]
 name = "hyli-verifiers"
-version = "0.13.0-rc.4"
-source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc1#e0534292f389e25296127b3a427690f2f7eb1376"
+version = "0.14.0-rc3"
+source = "git+https://github.com/hyli-org/hyli.git?tag=v0.14.0-rc3#71e3ee5bdec94ba540d9f091542e354c53cf1b51"
 dependencies = [
  "anyhow",
  "borsh",
@@ -8000,14 +8030,18 @@ version = "0.6.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "adc82fd73de2a9722ac5da747f12383d2bfdb93591ee6c58486e0097890f05f2"
 dependencies = [
+ "async-compression",
  "bitflags 2.9.3",
  "bytes",
+ "futures-core",
  "futures-util",
  "http 1.3.1",
  "http-body 1.0.1",
  "http-body-util",
  "iri-string",
  "pin-project-lite",
+ "tokio",
+ "tokio-util",
  "tower",
  "tower-layer",
  "tower-service",

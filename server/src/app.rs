@@ -23,6 +23,7 @@ use sdk::{Blob, BlobTransaction, ContractName};
 use serde::Serialize;
 use tokio::sync::Mutex;
 use tower_http::cors::{Any, CorsLayer};
+use tracing::warn;
 
 pub struct AppModule {
     bus: AppModuleBusClient,
@@ -157,7 +158,7 @@ async fn send(
     auth: AuthHeaders,
     wallet_blobs: [Blob; 2],
 ) -> Result<impl IntoResponse, AppError> {
-    let identity = auth.user.clone();
+    let identity = format!("{}@wallet", auth.user);
 
     let action_contract1 = Contract1Action::Increment;
 
@@ -172,6 +173,7 @@ async fn send(
 
     if let Err(ref e) = res {
         let root_cause = e.root_cause().to_string();
+        warn!("Error sending transaction: {}", root_cause);
         return Err(AppError(
             StatusCode::BAD_REQUEST,
             anyhow::anyhow!("{}", root_cause),
@@ -188,18 +190,27 @@ async fn send(
     tokio::time::timeout(Duration::from_secs(5), async {
         loop {
             match bus.recv().await? {
-                AutoProverEvent::<Contract1>::SuccessTx(sequenced_tx_hash, _) => {
-                    if sequenced_tx_hash == tx_hash {
-                        return Ok(Json(sequenced_tx_hash));
+                AutoProverEvent::<Contract1>::SuccessTx(sequenced_tx_id, _) => {
+                    if sequenced_tx_id.1 == tx_hash {
+                        return Ok(Json(sequenced_tx_id));
                     }
                 }
-                AutoProverEvent::<Contract1>::FailedTx(sequenced_tx_hash, error) => {
-                    if sequenced_tx_hash == tx_hash {
-                        return Err(AppError(StatusCode::BAD_REQUEST, anyhow::anyhow!(error)));
+                AutoProverEvent::<Contract1>::FailedTx(sequenced_tx_id, error) => {
+                    if sequenced_tx_id.1 == tx_hash {
+                        return Err(AppError(
+                            StatusCode::BAD_REQUEST,
+                            anyhow::anyhow!("Transaction failed: {}", error),
+                        ));
                     }
                 }
             }
         }
     })
-    .await?
+    .await
+    .map_err(|e| {
+        AppError(
+            StatusCode::BAD_REQUEST,
+            anyhow::anyhow!("Error waiting for transaction to settle: {}", e),
+        )
+    })?
 }

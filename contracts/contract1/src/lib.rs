@@ -8,8 +8,17 @@ pub mod client;
 #[cfg(feature = "client")]
 pub mod indexer;
 
+/// Contract state
+#[derive(BorshSerialize, BorshDeserialize, Serialize, Deserialize, Debug, Clone, Default)]
+pub struct Contract1 {
+    pub n: u128,
+}
+
+/// In this example, we serialize the full state on-chain
+/// Otherwise we should instead implement sdk::TransactionalZkContract
 impl sdk::FullStateRevert for Contract1 {}
 
+/// Contract entry point, mapping the actions to the contract functions
 impl sdk::ZkContract for Contract1 {
     /// Entry point of the contract's logic
     fn execute(&mut self, calldata: &sdk::Calldata) -> RunResult {
@@ -30,16 +39,17 @@ impl sdk::ZkContract for Contract1 {
     }
 }
 
+/// Contract functions
 impl Contract1 {
     pub fn increment(&mut self) -> Result<Vec<u8>, String> {
         self.n += 1;
         Ok(format!("Successfully incremented to {}", self.n).into_bytes())
     }
-}
 
-#[derive(BorshSerialize, BorshDeserialize, Serialize, Deserialize, Debug, Clone, Default)]
-pub struct Contract1 {
-    n: u128,
+    /// Helper to convert the state to bytes, because we serialize the full state on-chain
+    pub fn as_bytes(&self) -> Result<Vec<u8>, Error> {
+        borsh::to_vec(self)
+    }
 }
 
 /// Enum representing possible calls to the contract functions.
@@ -48,6 +58,7 @@ pub enum Contract1Action {
     Increment,
 }
 
+/// Helper to convert the action to a Blob
 impl Contract1Action {
     pub fn as_blob(&self, contract_name: sdk::ContractName) -> sdk::Blob {
         sdk::Blob {
@@ -57,16 +68,29 @@ impl Contract1Action {
     }
 }
 
-impl Contract1 {
-    pub fn as_bytes(&self) -> Result<Vec<u8>, Error> {
-        borsh::to_vec(self)
-    }
-}
-
+/// Helper to convert the state commitment back to the contract state, because we serialize the full state on-chain
 impl From<sdk::StateCommitment> for Contract1 {
     fn from(state: sdk::StateCommitment) -> Self {
         borsh::from_slice(&state.0)
             .map_err(|_| "Could not decode hyllar state".to_string())
             .unwrap()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_increment() {
+        let mut contract = Contract1::default();
+
+        assert_eq!(contract.n, 0);
+
+        contract.increment().unwrap();
+        assert_eq!(contract.n, 1);
+
+        contract.increment().unwrap();
+        assert_eq!(contract.n, 2);
     }
 }
