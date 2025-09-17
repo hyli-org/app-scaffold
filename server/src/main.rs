@@ -38,7 +38,7 @@ pub struct Args {
     pub contract1_cn: String,
 
     /// Clean the data directory before starting the server
-    /// Argument used by hylix tests commands
+    /// Argument used by hylix tests & run commands
     #[arg(long, default_value = "false")]
     pub clean_data_directory: bool,
 
