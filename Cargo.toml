@@ -3,17 +3,40 @@ resolver = "2"
 members = ["contracts", "contracts/contract1", "server"]
 
 [workspace.dependencies]
-sdk = { git = "https://github.com/hyli-org/hyli.git", package = "hyli-contract-sdk", tag = "v0.14.0-rc3" }
-client-sdk = { git = "https://github.com/hyli-org/hyli.git", default-features = false, package = "hyli-client-sdk", tag = "v0.14.0-rc3" }
-hyli-smt-token = { git = "https://github.com/hyli-org/hyli.git", package = "hyli-smt-token", tag = "v0.14.0-rc3" }
-hyli-modules = { git = "https://github.com/hyli-org/hyli.git", package = "hyli-modules", tag = "v0.14.0-rc3" }
+sdk = { git = "https://github.com/hyli-org/hyli.git", package = "hyli-contract-sdk", tag = "v0.14.1" }
+client-sdk = { git = "https://github.com/hyli-org/hyli.git", default-features = false, package = "hyli-client-sdk", tag = "v0.14.1" }
+hyli-smt-token = { git = "https://github.com/hyli-org/hyli.git", package = "hyli-smt-token", tag = "v0.14.1" }
+hyli-modules = { git = "https://github.com/hyli-org/hyli.git", package = "hyli-modules", tag = "v0.14.1" }
 
 contracts = { path = "contracts", default-features = false, package = "contracts" }
 contract1 = { path = "contracts/contract1", package = "contract1" }
+anyhow = "1.0.96"
+axum = "0.8.3"
+borsh = "1.6.0"
+clap = "4.5.28"
+config = { version = "0.15.11", default-features = false }
+hex = "0.4.3"
+hmac = "0.12.1"
+opentelemetry = "0.28"
+opentelemetry-prometheus = "0.28.0"
+opentelemetry_sdk = "0.28.0"
+prometheus = "0.13.4"
+rand = "0.9.0"
+reqwest = "0.12.9"
+risc0-build = "=3.0"
+risc0-zkvm = { version = "=3.0", default-features = false }
+secp256k1 = "0.30.0"
+serde = { version = "1.0", default-features = false }
+serde_json = "1.0"
+sha2 = "0.10.8"
+thiserror = "2.0"
+tokio = "1.44.2"
+tower-http = "0.6.2"
+tracing = "0.1.41"
+tracing-subscriber = "0.3.18"
+utoipa = "5.3.1"
+utoipa-axum = "0.2.0"
 
 [workspace.package]
 version = "0.4.1"
 edition = "2021"
-
-[patch.crates-io]
-sha2 = { git = "https://github.com/risc0/RustCrypto-hashes", tag = "sha2-v0.10.8-risczero.0" }

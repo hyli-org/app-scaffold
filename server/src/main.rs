@@ -17,7 +17,7 @@ use hyli_modules::{
         rest::{RestApi, RestApiRunContext},
         BuildApiContextInner, ModulesHandler,
     },
-    utils::logger::setup_tracing,
+    utils::logger::setup_otlp,
 };
 use prometheus::Registry;
 use sdk::{api::NodeInfo, info, ZkContract};
@@ -37,6 +37,10 @@ pub struct Args {
     #[arg(long, default_value = "contract1")]
     pub contract1_cn: String,
 
+    /// Enable tracing
+    #[arg(long, default_value = "false")]
+    pub tracing: bool,
+
     /// Clean the data directory before starting the server
     /// Argument used by hylix tests & run commands
     #[arg(long, default_value = "false")]
@@ -53,9 +57,10 @@ async fn main() -> Result<()> {
     let args = Args::parse();
     let config = Conf::new(args.config_file).context("reading config file")?;
 
-    setup_tracing(
+    setup_otlp(
         &config.log_format,
-        format!("{}(nopkey)", config.id.clone(),),
+        format!("{}", config.id.clone()),
+        args.tracing,
     )
     .context("setting up tracing")?;
 
