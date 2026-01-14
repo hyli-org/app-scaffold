@@ -1,5 +1,4 @@
-import { Buffer } from 'buffer'
-(window as any).Buffer = Buffer
+import './shims/buffer.ts';
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

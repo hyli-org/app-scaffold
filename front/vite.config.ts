@@ -1,24 +1,29 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  optimizeDeps: {
-    esbuildOptions: { target: "esnext" },
-    exclude: ["@noir-lang/noirc_abi", "@noir-lang/acvm_js"],
-  },
   resolve: {
-    alias: {
-      buffer: 'buffer',
+    alias: [
+      {
+        find: /^buffer$/,
+        replacement: path.resolve(__dirname, 'src/shims/buffer.ts'),
+      },
+    ],
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
     },
+    exclude: ['@noir-lang/noirc_abi', '@noir-lang/acvm_js'],
   },
   define: {
-    global: 'globalThis',
+    global: 'window',
   },
   server: {
     fs: {
       allow: ['../..'],
     },
   },
-});
+})
