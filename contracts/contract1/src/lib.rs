@@ -35,7 +35,7 @@ impl sdk::ZkContract for Contract1 {
 
     /// In this example, we serialize the full state on-chain.
     fn commit(&self) -> sdk::StateCommitment {
-        sdk::StateCommitment(self.as_bytes().expect("Failed to encsode Balances"))
+        sdk::StateCommitment(self.as_bytes().expect("Failed to encode Contract1 state"))
     }
 }
 
@@ -72,7 +72,7 @@ impl Contract1Action {
 impl From<sdk::StateCommitment> for Contract1 {
     fn from(state: sdk::StateCommitment) -> Self {
         borsh::from_slice(&state.0)
-            .map_err(|_| "Could not decode hyllar state".to_string())
+            .map_err(|_| "Could not decode Contract1 state".to_string())
             .unwrap()
     }
 }
