@@ -211,7 +211,7 @@ function App() {
         applicationWsUrl: import.meta.env.VITE_WALLET_WS_URL,
       }}
       sessionKeyConfig={{
-        duration: 24 * 60 * 60 * 1000, // Session key duration in ms (default: 72h)
+        duration: 24 * 60 * 60 * 1000, // Session key duration in ms (24h)
         whitelist: ["contract1"], // Required: contracts allowed for session key
       }}
     >

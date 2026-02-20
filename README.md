@@ -2,7 +2,7 @@
 
 This repository provides a scaffold to build applications on the Hyli network using Risc0 contracts.
 
-For step-by-step instructions, [follow our quickstart](https://docs.hyli.org/quickstart/run.md).
+For step-by-step instructions, [follow our quickstart](https://docs.hyli.org/quickstart/).
 
 ## Architecture
 
@@ -39,7 +39,7 @@ From the root of this repository:
 
 ```bash
 # Export devnet env vars first, so that server can connect to your local devnet
-source <(hy devnet env)>
+source <(hy devnet env)
 cargo run -p server
 ```
 
